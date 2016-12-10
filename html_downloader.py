@@ -1,4 +1,4 @@
-# _*_ coding:utf-8 _*_
+# -*- coding:utf-8 -*-
 
 from urllib import request
 import urllib
@@ -26,12 +26,28 @@ class HtmlDownloader(object):
 
 			#如果返回状态不是200，则打开异常，返回空值
 			if response.getcode() != 200:
+				print('Open url failed.')
 				return None
 
 			#如果正常打开，则返回读取到的html数据
 			return response.read()
 
-		#如果在打开url的过程中出现其他异常，则执行下面的代码
+		#如果在打开url的过程中出现其他异常，分几种情况处理
+		# 1. 403错误，是服务器禁止访问
+		except urllib.error.HTTPError as e:
+			#HTTP Error 403: Forbidden
+			print('Open url failed: ', e)
+			assert(e.endswith('Forbidden'))
+			return None
+
+		# 2. URLError，可能是网络不通无法访问
+		except urllib.error.URLError as e:
+			#<urlopen error [Errno 11001] getaddrinfo failed>
+			print('Open url failed: ', e)
+			return None
+
+		# 3. 其他异常
+		# 排除以上两种一场之后，如果还不能正常打开，则在下面将对应的url标记为读取失败
 		except:
 			#从当前需要打开的url中提取douban_id
 			douban_id = re.search(r'(\d+)', url).group(0)
@@ -39,7 +55,7 @@ class HtmlDownloader(object):
 			#执行sql语句，在craw_list中将当前url对应的douban_id的状态标记为-1（爬取失败）
 			self.cur.execute('UPDATE craw_list SET status = ? WHERE douban_id = ?', (-1, douban_id, ) )
 			self.conn.commit()
-			self.cur.close()
+			#self.cur.close()
 			
 			print('Open url failed.')
 			return None
