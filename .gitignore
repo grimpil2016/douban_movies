@@ -2,6 +2,12 @@
 Thumbs.db
 ehthumbs.db
 
+#Temp file
+temp.py
+*.sql
+*.bat
+*.sqlite
+
 # python cache files
 __pycache__
 
