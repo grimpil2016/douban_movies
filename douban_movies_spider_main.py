@@ -1,3 +1,5 @@
+# _*_ coding:utf-8 _*_
+
 import url_manager, html_downloader, html_parser, data_processor
 #, html_outputer
 
