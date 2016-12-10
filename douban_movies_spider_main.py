@@ -40,7 +40,7 @@ class SpiderMain(object):
 			try:
 				#获取新的待爬取url
 				new_url = self.urls.get_new_url()
-				print('\nCraw {0} : {1}'.format(count, new_url))
+				print('\nCraw {0}/{1}: {2}'.format(count, craw_num, new_url))
 				
 				#获取下载器返回的html页面数据
 				html_cont = self.downloader.download(new_url)
