@@ -82,7 +82,7 @@ class UrlManager(object):
 	def get_new_url(self):
 
 		#执行sql语句，检索并返回一条未爬取的douban_id
-		self.cur.execute('SELECT douban_id FROM craw_list WHERE status == 0 LIMIT 1')
+		self.cur.execute('SELECT douban_id FROM craw_list WHERE status == 0 order by random() LIMIT 1')
 		row = self.cur.fetchone()
 
 		#如果检索结果不为空，则把获取的douban_id和root_url合并，组成真正的url

@@ -20,6 +20,9 @@ class HtmlDownloader(object):
 		if url is None:
 			return None
 
+		#从当前需要打开的url中提取douban_id
+		douban_id = re.search(r'(\d+)', url).group(0)
+
 		try:
 			#打开给定的url
 			response = urllib.request.urlopen(url)
@@ -37,8 +40,15 @@ class HtmlDownloader(object):
 		except urllib.error.HTTPError as e:
 			#HTTP Error 403: Forbidden
 			print('Open url failed: ', e)
-			assert(e.endswith('Forbidden'))
-			return None
+
+			if e.endswith('Not Found'):
+				#执行sql语句，在craw_list中将当前url对应的douban_id的状态标记为-1（爬取失败）
+				self.cur.execute('UPDATE craw_list SET status = ? WHERE douban_id = ?', (-1, douban_id, ) )
+				self.conn.commit()
+
+			if e.endswith('Forbidden'):
+				# 此时返回403，爬虫主程序可据此返回值进行判断并跳出循环
+				return 403
 
 		# 2. URLError，可能是网络不通无法访问
 		except urllib.error.URLError as e:
@@ -48,10 +58,7 @@ class HtmlDownloader(object):
 
 		# 3. 其他异常
 		# 排除以上两种一场之后，如果还不能正常打开，则在下面将对应的url标记为读取失败
-		except:
-			#从当前需要打开的url中提取douban_id
-			douban_id = re.search(r'(\d+)', url).group(0)
-			
+		else:
 			#执行sql语句，在craw_list中将当前url对应的douban_id的状态标记为-1（爬取失败）
 			self.cur.execute('UPDATE craw_list SET status = ? WHERE douban_id = ?', (-1, douban_id, ) )
 			self.conn.commit()
