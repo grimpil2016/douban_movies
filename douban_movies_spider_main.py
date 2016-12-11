@@ -3,6 +3,7 @@
 import url_manager, html_downloader, html_parser, data_processor
 #, html_outputer
 from time import sleep
+import time
 
 #爬虫主对象
 class SpiderMain(object):
@@ -28,13 +29,9 @@ class SpiderMain(object):
 	#爬虫主程序
 	def craw(self, start_url):
 
-		#创建计数器
-		count = 1
-
 		#获取每次(sleep_time时间内)想要爬取电影的数量
 		#craw_num = int(input('Enter a number: '))
 		craw_num = 50
-
 
 		# 添加启动页面到url列表中
 		self.urls.add_new_url(start_url)
@@ -42,7 +39,11 @@ class SpiderMain(object):
 		#创建外层循环，每sleep_time时间执行一次，爬取craw_num条数据
 		while True:
 			print('Try to craw %d movies.' % craw_num)
+			print(time.ctime())
 		
+			#创建内层循环计数器
+			count = 1
+
 			#如果url列表中有未爬取的url，就循环执行以下代码
 			while self.urls.has_new_url():
 				try:
@@ -80,7 +81,8 @@ class SpiderMain(object):
 
 			#一轮任务结束，等待600秒，继续下一轮
 			sleep_time = 600
-			print('\nWait %d seconds to craw %d  more movies...\n' % sleep_time, craw_num)
+			print('\nWait %d seconds to craw %d  more movies...\n' % (sleep_time, craw_num)
+			print(time.ctime())
 			sleep(sleep_time)
 
 if __name__ == '__main__':
