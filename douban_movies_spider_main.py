@@ -38,8 +38,8 @@ class SpiderMain(object):
 
 		#创建外层循环，每sleep_time时间执行一次，爬取craw_num条数据
 		while True:
-			print('Try to craw %d movies.' % craw_num)
 			print(time.ctime())
+			print('Try to craw %d movies.' % craw_num)
 		
 			#创建内层循环计数器
 			count = 1
@@ -81,7 +81,7 @@ class SpiderMain(object):
 
 			#一轮任务结束，等待600秒，继续下一轮
 			sleep_time = 600
-			print('\nWait %d seconds to craw %d  more movies...\n' % (sleep_time, craw_num)
+			print('\nWait %d seconds to craw %d  more movies...' % (sleep_time, craw_num))
 			print(time.ctime())
 			sleep(sleep_time)
 
