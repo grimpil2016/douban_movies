@@ -2,8 +2,10 @@
 
 import url_manager, html_downloader, html_parser, data_processor
 #, html_outputer
-from time import sleep
 import time
+from time import sleep
+import random
+
 
 #爬虫主对象
 class SpiderMain(object):
@@ -36,6 +38,7 @@ class SpiderMain(object):
 		# 添加启动页面到url列表中
 		self.urls.add_new_url(start_url)
 
+		group = 0
 		#创建外层循环，每sleep_time时间执行一次，爬取craw_num条数据
 		while True:
 			print('\nTry to craw %d movies.' % craw_num)
@@ -79,21 +82,25 @@ class SpiderMain(object):
 				#异常处理，有异常则输出'Craw failed.'，执行下一条
 				except:
 					print('Craw failed.')
-	
-				sleep(5)
+
+				sleep(random.randint(1,3))
 
 			#获取每次外层循环结束时间
 			end_time = time.time()
 
 			#计算一轮任务所用时间
-			time = int(end_time - start_time)
-			print('\nTime cost: %d min %d sec.' % (int(time/60), time%60))
+			time_cost = int(end_time - start_time)
+			print('\nTime cost: %d min %d sec.' % (int(time_cost/60), time_cost%60))
 			
 			#一轮任务结束，等待600秒，继续下一轮
-			sleep_time = 600
+			sleep_time = random.randint(60, 180)
 			print('Wait %d seconds to craw %d  more movies...' % (sleep_time, craw_num))
 			print(time.ctime())
 			sleep(sleep_time)
+
+			group += 1
+
+		print('\Crawed %d movies totally.' % group * craw_num + count)
 
 if __name__ == '__main__':
 	# 启动页面为目前排名第一的电影：肖申克的救赎 The Shawshank Redemption
