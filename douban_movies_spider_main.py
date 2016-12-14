@@ -33,7 +33,7 @@ class SpiderMain(object):
 
 		#获取每次(sleep_time时间内)想要爬取电影的数量
 		#craw_num = int(input('Enter a number: '))
-		craw_num = 50
+		craw_num = 100
 
 		# 添加启动页面到url列表中
 		self.urls.add_new_url(start_url)
@@ -83,7 +83,7 @@ class SpiderMain(object):
 				except:
 					print('Craw failed.')
 
-				sleep(random.randint(1,3))
+				sleep(random.randint(0,2))
 
 			#获取每次外层循环结束时间
 			end_time = time.time()
@@ -93,7 +93,7 @@ class SpiderMain(object):
 			print('\nTime cost: %d min %d sec.' % (int(time_cost/60), time_cost%60))
 			
 			#一轮任务结束，等待600秒，继续下一轮
-			sleep_time = random.randint(60, 180)
+			sleep_time = random.randint(15, 30)
 			print('Wait %d seconds to craw %d  more movies...' % (sleep_time, craw_num))
 			print(time.ctime())
 			sleep(sleep_time)
