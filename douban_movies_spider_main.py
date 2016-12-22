@@ -1,17 +1,20 @@
 # -*- coding:utf-8 -*-
 
-import url_manager, html_downloader, html_parser, data_processor
-#, html_outputer
+import url_manager, html_downloader, html_parser, data_manager, database_init
+#data_processor, html_outputer
 import time
 from time import sleep
 import random
-
 
 #爬虫主对象
 class SpiderMain(object):
 
 	#初始化程序，实例化各个对象
 	def __init__(self):
+
+		#初始化数据库
+		self.init = database_init.TableCreator()
+		self.init.create()
 
 		#创建url管理器
 		self.urls = url_manager.UrlManager()
@@ -23,7 +26,8 @@ class SpiderMain(object):
 		self.parser = html_parser.HtmlParser()
 
 		#创建数据处理器
-		self.processor = data_processor.DataProcessor()
+		#self.processor = data_processor.DataProcessor()
+		self.manager = data_manager.DataManager()
 
 		#创建html输出器
 		#self.outputer = html_outputer.HtmlOutputer()
@@ -41,7 +45,7 @@ class SpiderMain(object):
 		group = 0
 		#创建外层循环，每sleep_time时间执行一次，爬取craw_num条数据
 		while True:
-			print('\nTry to craw %d movies.' % craw_num)
+			print('\nStart to craw %s movies.' % craw_num)
 			
 			#获取每次外层循环开始时间
 			start_time = time.time()
@@ -52,36 +56,37 @@ class SpiderMain(object):
 
 			#如果url列表中有未爬取的url，就循环执行以下代码
 			while self.urls.has_new_url():
-				try:
+				#try:
 					#获取新的待爬取url
-					new_url = self.urls.get_new_url()
-					print('\nCraw {0}/{1}: {2}'.format(count, craw_num, new_url))
-					
-					#获取下载器返回的html页面数据
-					html_cont = self.downloader.download(new_url)
-	
-					#下载器返回403，说明已被禁止访问，此时须跳出循环，终止爬取
-					if html_cont == 403: break
-	
-					print('html cont is not None: ', html_cont is not None)
-	
-					#获取解析器返回的url和电影信息
-					new_urls, new_data = self.parser.parse(new_url, html_cont)
-					print('new_urls is not None: ', new_urls is not None)
-					print('new_data is not None: ', new_data is not None)
-	
-					#将获取到的url和电影信息写入数据库
-					self.urls.add_new_urls(new_urls)
-					self.processor.add_new_data(new_data)
-	
-					#如果计数器达到指定的爬取数量，跳出循环，结束任务
-					if count == craw_num:
-						break
-					count += 1
+				new_url = self.urls.get_new_url()
+				print('\nCraw {0}/{1}: {2}'.format(count, craw_num, new_url))
+				
+				#获取下载器返回的html页面数据
+				html_cont = self.downloader.download(new_url)
+
+				#下载器返回403，说明已被禁止访问，此时须跳出循环，终止爬取
+				if html_cont == 403: break
+
+				print('html cont is not None: ', html_cont is not None)
+
+				#获取解析器返回的url和电影信息
+				new_urls, new_data = self.parser.parse(new_url, html_cont)
+				print('new_urls is not None: ', new_urls is not None)
+				print('new_data is not None: ', new_data is not None)
+
+				#将获取到的url和电影信息写入数据库
+				self.urls.add_new_urls(new_urls)
+				#self.processor.add_new_data(new_data)
+				self.manager.add_new_data(new_data)
+
+				#如果计数器达到指定的爬取数量，跳出循环，结束任务
+				if count == craw_num:
+					break
+				count += 1
 					
 				#异常处理，有异常则输出'Craw failed.'，执行下一条
-				except:
-					print('Craw failed.')
+				#except Exception as e:
+				#	print('Craw failed: ', str(e))
 
 				sleep(random.randint(0,2))
 
