@@ -55,7 +55,7 @@ class UrlManager(object):
 			for url in urls:
 				#调用add_new_url()，将url加入表craw_list中
 				self.add_new_url(url)
-			print('==Add urls successed.==')
+			print('== Add urls successfully. ==')
 		except Exception as e:
 			print('Add urls failed: ', e)
 

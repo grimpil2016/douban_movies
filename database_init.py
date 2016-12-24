@@ -24,19 +24,19 @@ class TableCreator(object):
 			CREATE TABLE IF NOT EXISTS `douban_movies`.`movies` (
 			  `douban_id` INT NOT NULL AUTO_INCREMENT,
 			  `imdb_id` VARCHAR(16) NULL,
-			  `title` VARCHAR(128) NULL,
+			  `title` VARCHAR(256) NULL,
 			  `year` INT NULL,
-			  `runtime` VARCHAR(128) NULL,
-			  `release_time` VARCHAR(128) NULL,
-			  `other_names` VARCHAR(128) NULL,
-			  `summary` VARCHAR(1024) NULL,
+			  `runtime` VARCHAR(512) NULL,
+			  `release_time` VARCHAR(512) NULL,
+			  `other_names` VARCHAR(512) NULL,
+			  `summary` VARCHAR(2048) NULL,
 			  `watched_num` INT NULL,
 			  `to_watch_num` INT NULL,
 			  `comments_num` INT NULL,
 			  `reviews_num` INT NULL,
 			  `questions_num` INT NULL,
-			  `img_url` VARCHAR(128) NULL,
-			  `website` VARCHAR(128) NULL,
+			  `img_url` VARCHAR(256) NULL,
+			  `website` VARCHAR(256) NULL,
 			  PRIMARY KEY (`douban_id`),
 			  UNIQUE INDEX `douban_id_UNIQUE` (`douban_id` ASC))
 			ENGINE = InnoDB;
@@ -50,7 +50,7 @@ class TableCreator(object):
 			CREATE TABLE IF NOT EXISTS `douban_movies`.`directors` (
 			  `director_id` INT NOT NULL AUTO_INCREMENT,
 			  `director_douban_id` INT NULL,
-			  `director_name` VARCHAR(32) NULL,
+			  `director_name` VARCHAR(64) NULL,
 			  UNIQUE INDEX `director_id_UNIQUE` (`director_id` ASC),
 			  PRIMARY KEY (`director_id`))
 			ENGINE = InnoDB;
@@ -64,7 +64,7 @@ class TableCreator(object):
 			CREATE TABLE IF NOT EXISTS `douban_movies`.`writers` (
 			  `writer_id` INT NOT NULL AUTO_INCREMENT,
 			  `writer_douban_id` INT NULL,
-			  `writer_name` VARCHAR(32) NULL,
+			  `writer_name` VARCHAR(64) NULL,
 			  PRIMARY KEY (`writer_id`),
 			  UNIQUE INDEX `writer_id_UNIQUE` (`writer_id` ASC))
 			ENGINE = InnoDB;
@@ -78,7 +78,7 @@ class TableCreator(object):
 			CREATE TABLE IF NOT EXISTS `douban_movies`.`stars` (
 			  `star_id` INT NOT NULL AUTO_INCREMENT,
 			  `star_douban_id` INT NULL,
-			  `star_name` VARCHAR(32) NULL,
+			  `star_name` VARCHAR(64) NULL,
 			  PRIMARY KEY (`star_id`),
 			  UNIQUE INDEX `star_id_UNIQUE` (`star_id` ASC))
 			ENGINE = InnoDB;
@@ -91,7 +91,7 @@ class TableCreator(object):
 
 			CREATE TABLE IF NOT EXISTS `douban_movies`.`genres` (
 			  `genre_id` INT NOT NULL AUTO_INCREMENT,
-			  `genre` VARCHAR(32) NULL,
+			  `genre` VARCHAR(64) NULL,
 			  PRIMARY KEY (`genre_id`),
 			  UNIQUE INDEX `genre_UNIQUE` (`genre` ASC))
 			ENGINE = InnoDB;
@@ -118,7 +118,7 @@ class TableCreator(object):
 
 			CREATE TABLE IF NOT EXISTS `douban_movies`.`languages` (
 			  `language_id` INT NOT NULL AUTO_INCREMENT,
-			  `language` VARCHAR(32) NULL,
+			  `language` VARCHAR(64) NULL,
 			  PRIMARY KEY (`language_id`),
 			  UNIQUE INDEX `language_UNIQUE` (`language` ASC))
 			ENGINE = InnoDB;
@@ -236,7 +236,7 @@ class TableCreator(object):
 
 			CREATE TABLE IF NOT EXISTS `douban_movies`.`tags` (
 			  `tag_id` INT NOT NULL AUTO_INCREMENT,
-			  `tag` VARCHAR(64) NULL,
+			  `tag` VARCHAR(128) NULL,
 			  PRIMARY KEY (`tag_id`),
 			  UNIQUE INDEX `tag_id_UNIQUE` (`tag_id` ASC),
 			  UNIQUE INDEX `tag_UNIQUE` (`tag` ASC))
@@ -255,4 +255,7 @@ class TableCreator(object):
 			ENGINE = InnoDB;
 		''')
 
-	print('Created 17 tables successfully.')
+init = TableCreator()
+init.create()
+
+print('Created 17 tables successfully.')

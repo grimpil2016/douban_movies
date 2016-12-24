@@ -29,6 +29,7 @@ class DataManager(object):
 
 		#如果有，则返回
 		if row is not None:
+			self.cur.execute('UPDATE craw_list SET status = 1 WHERE douban_id = %s', (new_data['douban_id'], ) )
 			print('Data exists, try next.')
 			return
 
@@ -195,16 +196,13 @@ class DataManager(object):
 			(douban_id, rate, rate_num, rate_per_5stars, rate_per_4stars, rate_per_3stars, rate_per_2stars, rate_per_1star)
 			VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''', (new_data['douban_id'], new_data['rate'], new_data['rate_num'], rate_percent[0], rate_percent[1], rate_percent[2], rate_percent[3], rate_percent[4]) )
 
-		# 向表craw_list内写入爬取记录
-		# 数据添加成功，标记当前douban_id的状态为1（爬取成功）
+		# 数据添加成功，向表craw_list内标记当前douban_id的状态为1（爬取成功）
 		craw_time = time.ctime()
-		self.cur.execute('''INSERT IGNORE INTO craw_list (douban_id, status, craw_time) 
-			VALUES (%s, %s, %s)''', (new_data['douban_id'], 1, craw_time) )
+		
+		self.cur.execute('UPDATE craw_list SET status = %s, craw_time = %s WHERE douban_id = %s', (1, craw_time, new_data['douban_id']) )
 		self.conn.commit()
-		print('Movie data stored successfully.')
 
-		self.cur.execute('UPDATE craw_list SET status = %s WHERE douban_id = %s', (1, new_data['douban_id'], ) )
-		self.conn.commit()
+		print('== Add data successfully. ==')
 
 
 

@@ -4,6 +4,7 @@ from urllib import request
 import urllib
 import re
 import pymysql
+import time
 
 # html下载器，用于从指定的url下载html数据
 # 包含一个初始化程序和一个download()方法
@@ -42,12 +43,14 @@ class HtmlDownloader(object):
 			#HTTP Error 403: Forbidden
 			print('Open url failed: ', e)
 
-			if e.endswith('Not Found'):
+			if str(e).endswith('Not Found'):
 				#执行sql语句，在craw_list中将当前url对应的douban_id的状态标记为-1（爬取失败）
-				self.cur.execute('UPDATE craw_list SET status = %s AND craw_time = %s WHERE douban_id = %s', (-1, current_time, douban_id) )
+				current_time = time.ctime()
+				self.cur.execute('UPDATE craw_list SET status = %s, craw_time = %s WHERE douban_id = %s', (-1, current_time, douban_id) )
 				self.conn.commit()
+				return None
 
-			if e.endswith('Forbidden'):
+			if str(e).endswith('Forbidden'):
 				# 此时返回403，爬虫主程序可据此返回值进行判断并跳出循环
 				return 403
 
@@ -58,11 +61,11 @@ class HtmlDownloader(object):
 			return None
 
 		# 3. 其他异常
-		# 排除以上两种一场之后，如果还不能正常打开，则在下面将对应的url标记为读取失败
+		# 排除以上两种异常之后，如果还不能正常打开，则在下面将对应的url标记为读取失败
 		else:
 			#执行sql语句，在craw_list中将当前url对应的douban_id的状态标记为-1（爬取失败）
 			current_time = time.ctime()
-			self.cur.execute('UPDATE craw_list SET status = %s AND  craw_time = %s WHERE douban_id = %s', (-1, current_time, douban_id) )
+			self.cur.execute('UPDATE craw_list SET status = %s, craw_time = %s WHERE douban_id = %s', (-1, current_time, douban_id) )
 			self.conn.commit()
 			#self.cur.close()
 			

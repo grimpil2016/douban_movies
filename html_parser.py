@@ -58,6 +58,7 @@ class HtmlParser(object):
 			if len(title_node) > 1:
 				res_data['title'] = title_node[0].get_text()
 				res_data['year'] = title_node[1].get_text()[1:-1]
+			print('Title: ', res_data['title'])
 		except:
 			pass
 
