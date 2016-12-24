@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 import sqlite3
+import pymysql
 import re
 
 # url 管理器，用于管理待爬取和已爬取的url
@@ -15,16 +16,9 @@ class UrlManager(object):
 		self.root_url = 'https://movie.douban.com/subject/'
 
 		#创建连接打开sqlite数据库文件
-		self.conn = sqlite3.connect('douban_movies.sqlite')
+		#self.conn = sqlite3.connect('douban_movies.sqlite')
+		self.conn = pymysql.connect(host='localhost', user='root', password='r00t2oi6',db='douban_movies', port=3306, charset='utf8')
 		self.cur = self.conn.cursor()
-
-		#执行sql语句，如果数据库中没有表craw_list则创建，有则忽略
-		#status 用于标识每个url(douban_id)的状态
-		# 0 = 未爬取， 1 = 爬取成功， -1 = 爬取失败， -2 = 数据写入失败
-		self.cur.execute('''CREATE TABLE IF NOT EXISTS craw_list
-			(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 
-			 douban_id TEXT NOT NULL UNIQUE, 
-			 status INTEGER NOT NULL)''')
 
 	#添加单条url到表craw_list中
 	def add_new_url(self, url):
@@ -32,20 +26,20 @@ class UrlManager(object):
 			return
 
 		#从url参数中提取数字串，可作为唯一id区别每一部电影
-		douban_id = re.search(r'(\d+)', url).group(0)
+		douban_id = re.search(r'(\d{4,})', url).group(0)
 
 		#从表craw_list中查询当前的douban_id
-		self.cur.execute('SELECT douban_id FROM craw_list WHERE douban_id = ?', (douban_id, ) )
+		self.cur.execute('SELECT douban_id FROM craw_list WHERE douban_id = %s', (douban_id, ) )
 		row = self.cur.fetchone()
 		
 		#如果返回结果不为空，则说明表中已有此douban_id
 		if row is not None:
 			return
 
-		#否则，就将此此douban_id添加到表craw_list中，并标记状态为 0
+		#否则，就将此douban_id添加到表craw_list中，并标记状态为 0
 		else:
-			self.cur.execute('''INSERT OR IGNORE INTO craw_list (douban_id, status)
-				VALUES ( ?, 0)''', (douban_id, ) )
+			self.cur.execute('''INSERT IGNORE INTO craw_list (douban_id, status)
+				VALUES ( %s, 0)''', (douban_id, ) )
 			self.conn.commit()
 
 
@@ -61,16 +55,16 @@ class UrlManager(object):
 			for url in urls:
 				#调用add_new_url()，将url加入表craw_list中
 				self.add_new_url(url)
-			print('==Add urls successed.==')
-		except:
-			print('Add urls failed.')
+			print('== Add urls successfully. ==')
+		except Exception as e:
+			print('Add urls failed: ', e)
 
 	# 查询表craw_list中是否还有未爬取的url
 	# 返回true则为有，返回false则没有
 	def has_new_url(self):
 		
 		#执行sql语句，检索状态为0（未爬取）的douban_id
-		self.cur.execute('SELECT douban_id FROM craw_list WHERE status == 0')
+		self.cur.execute('SELECT douban_id FROM craw_list WHERE status = 0')
 		row = self.cur.fetchone()
 
 		#检索结果不为空，则说明有，否则为没有	
@@ -82,12 +76,12 @@ class UrlManager(object):
 	def get_new_url(self):
 
 		#执行sql语句，检索并返回一条未爬取的douban_id
-		self.cur.execute('SELECT douban_id FROM craw_list WHERE status == 0 order by random() LIMIT 1')
-		row = self.cur.fetchone()
-
+		self.cur.execute('SELECT douban_id FROM craw_list WHERE status = 0 ORDER BY RAND() LIMIT 1')
+		row = self.cur.fetchone()[0]
+		#print(row)
 		#如果检索结果不为空，则把获取的douban_id和root_url合并，组成真正的url
 		if row is not None:
-			new_url = self.root_url + row[0] +'/'
+			new_url = self.root_url + str(row) +'/'
 			return new_url
 		else:
 			print('Get uncrawed url failed.')
